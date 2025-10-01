@@ -1,0 +1,22 @@
+# Python
+__pycache__/
+*.pyc
+*.pyo
+*.pyd
+*.egg-info/
+.venv/
+env/
+venv/
+
+# FastAPI / logs
+*.log
+
+# IDE
+.vscode/
+.idea/
+
+# Environment files
+*.env
+
+# Mac
+.DS_Store
