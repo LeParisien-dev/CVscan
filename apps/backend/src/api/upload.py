@@ -37,7 +37,7 @@ async def upload_cv(file: UploadFile = File(...), db: Session = Depends(get_db))
         text = extract_text_from_pdf(str(file_path))
     else:
         try:
-            text = file_path.read_text(encoding="utf-8")
+            text = file_path.read_text(encoding="utf-8", errors="ignore")
         except Exception as e:
             raise HTTPException(status_code=500, detail=f"Error reading TXT: {e}")
 
