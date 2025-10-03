@@ -1,12 +1,11 @@
-from fastapi import APIRouter
+from fastapi import APIRouter, Depends
 from pydantic import BaseModel
-from pathlib import Path
+from sqlalchemy.orm import Session
+from src.core.database import get_db
+from src.models.job import Job
 import uuid
-import json
 
 router = APIRouter()
-JOBS_DIR = Path("jobs")
-JOBS_DIR.mkdir(parents=True, exist_ok=True)
 
 class JobDescription(BaseModel):
     title: str
@@ -14,16 +13,22 @@ class JobDescription(BaseModel):
     description: str
 
 @router.post("/job")
-def create_job(job: JobDescription):
-    """Store a job description locally as a JSON file."""
+def create_job(job: JobDescription, db: Session = Depends(get_db)):
+    """Store a job description in the database."""
     job_id = str(uuid.uuid4())
-    file_path = JOBS_DIR / f"{job_id}.json"
 
-    with open(file_path, "w") as f:
-        json.dump(job.dict(), f, indent=2)
+    db_job = Job(
+        job_id=job_id,
+        title=job.title,
+        company=job.company,
+        description=job.description,
+    )
+    db.add(db_job)
+    db.commit()
+    db.refresh(db_job)
 
     return {
         "status": "success",
-        "job_id": job_id,
+        "job_id": db_job.job_id,
         "message": "Job description stored successfully"
     }
