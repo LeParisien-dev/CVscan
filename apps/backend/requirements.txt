@@ -1,0 +1,28 @@
+# --- Framework and server ---
+fastapi==0.115.0
+uvicorn[standard]==0.30.6
+python-multipart==0.0.20
+
+# --- Environment variables ---
+python-dotenv==1.0.1
+
+# --- Database ---
+sqlalchemy==2.0.23
+psycopg2-binary==2.9.9
+alembic==1.13.2
+
+# --- Validation and data models ---
+pydantic>=2.7,<3.0
+
+# --- File parsing (CV processing) ---
+pdfplumber==0.10.2
+PyPDF2==3.0.1
+
+# --- AI / LLM integration ---
+langchain>=0.3.7,<0.4.0        
+langchain-openai>=0.3.34,<0.4.0
+tiktoken>=0.7.0,<0.8.0
+numpy==1.26.4
+
+# --- Testing ---
+pytest==8.3.3

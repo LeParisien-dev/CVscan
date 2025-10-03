@@ -1,0 +1,32 @@
+version: "3.9"
+
+services:
+  cvscan_backend:
+    build:
+      context: ..
+      dockerfile: infra/Dockerfile
+    container_name: cvscan_backend
+    ports:
+      - "7000:7000"
+    env_file:
+      - ../apps/backend/.env
+    volumes:
+      - ../apps/backend:/app/apps/backend
+    restart: always
+    depends_on:
+      - cvscan_postgres
+
+  cvscan_postgres:
+    image: postgres:15
+    container_name: cvscan_postgres
+    environment:
+      POSTGRES_USER: cvscan
+      POSTGRES_PASSWORD: cvscan_pass
+      POSTGRES_DB: cvscan_db
+    ports:
+      - "5432:5432"
+    volumes:
+      - cvscan_pgdata:/var/lib/postgresql/data
+
+volumes:
+  cvscan_pgdata:

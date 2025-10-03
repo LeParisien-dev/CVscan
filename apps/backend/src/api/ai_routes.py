@@ -1,6 +1,7 @@
 from fastapi import APIRouter
 from pydantic import BaseModel
-from ..services.llm.llm_service import LlmService
+
+from services.llm.llm_service import LlmService  # corrigé: plus de ".."
 
 router = APIRouter(prefix="/ai", tags=["AI"])
 

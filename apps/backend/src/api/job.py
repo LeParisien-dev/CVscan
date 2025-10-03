@@ -1,4 +1,4 @@
-from fastapi import APIRouter, HTTPException
+from fastapi import APIRouter
 from pydantic import BaseModel
 from pathlib import Path
 import uuid
@@ -16,7 +16,7 @@ class JobDescription(BaseModel):
 
 @router.post("/job")
 def create_job(job: JobDescription):
-    job_id = str(uuid.uuid4())  # unique identifier
+    job_id = str(uuid.uuid4())
     file_path = JOBS_DIR / f"{job_id}.json"
 
     with open(file_path, "w") as f:
