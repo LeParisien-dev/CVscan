@@ -5,7 +5,6 @@ import uuid
 import json
 
 router = APIRouter()
-
 JOBS_DIR = Path("jobs")
 JOBS_DIR.mkdir(parents=True, exist_ok=True)
 
@@ -16,6 +15,7 @@ class JobDescription(BaseModel):
 
 @router.post("/job")
 def create_job(job: JobDescription):
+    """Store a job description locally as a JSON file."""
     job_id = str(uuid.uuid4())
     file_path = JOBS_DIR / f"{job_id}.json"
 

@@ -1,7 +1,6 @@
 from fastapi import APIRouter
 from pydantic import BaseModel
-
-from services.llm.llm_service import LlmService  # corrigé: plus de ".."
+from src.services.llm.llm_service import LlmService
 
 router = APIRouter(prefix="/ai", tags=["AI"])
 
@@ -11,6 +10,7 @@ class AnalyzeRequest(BaseModel):
 
 @router.post("/analyze-cv")
 async def analyze_cv(req: AnalyzeRequest):
+    """Analyze a CV against an optional job description using LLM service."""
     llm = LlmService()
     prompt = (
         "You are a CV screening assistant.\n"

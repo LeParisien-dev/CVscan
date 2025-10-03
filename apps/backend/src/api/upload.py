@@ -9,11 +9,8 @@ from src.core.database import SessionLocal
 from src.models.cv_document import CVDocument
 
 router = APIRouter()
-
-# Directory for storing uploaded files
 UPLOAD_DIR = Path("uploads")
 UPLOAD_DIR.mkdir(parents=True, exist_ok=True)
-
 
 # Dependency for database session
 def get_db():
@@ -23,24 +20,22 @@ def get_db():
     finally:
         db.close()
 
-
-# Endpoint: upload a CV
 @router.post("/upload-cv")
 async def upload_cv(file: UploadFile = File(...), db: Session = Depends(get_db)):
-    # Validate file type
+    """Upload a CV, extract its content, compute a score, and store in DB."""
     if not file.filename.endswith((".pdf", ".txt")):
         raise HTTPException(status_code=400, detail="Only PDF or TXT files are allowed")
 
     file_path = UPLOAD_DIR / file.filename
 
-    # Save the uploaded file
+    # Save file
     with open(file_path, "wb") as buffer:
         shutil.copyfileobj(file.file, buffer)
 
-    # Extract text depending on file type
+    # Extract text
     if file.filename.endswith(".pdf"):
         text = extract_text_from_pdf(str(file_path))
-    else:  # TXT file
+    else:
         try:
             text = file_path.read_text(encoding="utf-8")
         except Exception as e:
@@ -49,8 +44,8 @@ async def upload_cv(file: UploadFile = File(...), db: Session = Depends(get_db))
     # Compute score
     score = score_text(text)
 
-    # Insert document into the database
-    cv_doc = CvDocument(
+    # Store in DB
+    cv_doc = CVDocument(
         filename=file.filename,
         content=text,
         score=score
@@ -59,7 +54,6 @@ async def upload_cv(file: UploadFile = File(...), db: Session = Depends(get_db))
     db.commit()
     db.refresh(cv_doc)
 
-    # Return response
     return {
         "status": "success",
         "filename": file.filename,

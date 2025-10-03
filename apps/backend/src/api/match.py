@@ -6,7 +6,6 @@ import json
 from src.services.langchain_service import compute_similarity
 
 router = APIRouter()
-
 UPLOAD_DIR = Path("uploads")
 JOBS_DIR = Path("jobs")
 
@@ -16,6 +15,7 @@ class MatchRequest(BaseModel):
 
 @router.post("/match")
 def match_cv_to_job(request: MatchRequest):
+    """Match an uploaded CV to a stored job description and return similarity score."""
     cv_path = UPLOAD_DIR / request.cv_filename
     job_path = JOBS_DIR / f"{request.job_id}.json"
 
