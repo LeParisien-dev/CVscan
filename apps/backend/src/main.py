@@ -2,7 +2,10 @@ import os
 import time
 from fastapi import FastAPI
 from fastapi.middleware.cors import CORSMiddleware
+from fastapi import APIRouter
+from fastapi.responses import JSONResponse
 from dotenv import load_dotenv
+from datetime import datetime
 
 # Load environment variables
 load_dotenv()
@@ -41,6 +44,14 @@ app.include_router(upload.router, prefix="/api/v1")
 app.include_router(job.router, prefix="/api/v1")
 app.include_router(match.router, prefix="/api/v1")
 app.include_router(ai_routes.router, prefix="/api/v1")
+
+# Add HEAD compatibility for health check
+@app.api_route("/api/v1/health", methods=["GET", "HEAD"], include_in_schema=False)
+async def health_check():
+    return JSONResponse(content={
+        "status": "ok",
+        "timestamp": datetime.utcnow().isoformat()
+    })
 
 # Root route (useful for recruiters visiting Render root URL)
 @app.get("/")
