@@ -7,12 +7,13 @@ export const api = axios.create({
     withCredentials: false
 })
 
-// Helpers for endpoints you already have
+// --- SYSTEM HEALTH ---
 export async function pingHealth() {
     const { data } = await api.get("/api/v1/health")
     return data
 }
 
+// --- UPLOAD (Render backend direct) ---
 export async function uploadCV(file: File) {
     const fd = new FormData()
     fd.append("file", file)
@@ -22,16 +23,25 @@ export async function uploadCV(file: File) {
     return data
 }
 
+// --- JOB CREATION ---
 export async function createJob(payload: { job_id?: string; content: string }) {
     const { data } = await api.post("/api/v1/job", payload)
     return data
 }
 
+// --- LEGACY MATCH (random/LLM placeholder) ---
 export async function matchCV(payload: { cv_filename: string; job_id: string }) {
     const { data } = await api.post("/api/v1/match", payload)
     return data
 }
 
+// --- NEW: AI-Lite Statistical Match ---
+export async function matchStatCV(payload: { cv_filename: string; job_id: string }) {
+    const { data } = await api.post("/api/v1/match-stat", payload)
+    return data
+}
+
+// --- AI CHAT (not used here but kept for completeness) ---
 export async function aiChat(prompt: string) {
     const { data } = await api.post("/api/v1/ai", { prompt })
     return data
