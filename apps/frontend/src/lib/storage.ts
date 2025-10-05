@@ -1,4 +1,3 @@
-// apps/frontend/src/lib/storage.ts
 import { createClient } from "@supabase/supabase-js"
 
 // Pull vars from environment
