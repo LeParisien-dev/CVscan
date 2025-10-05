@@ -6,6 +6,7 @@ from fastapi import APIRouter
 from fastapi.responses import JSONResponse
 from dotenv import load_dotenv
 from datetime import datetime
+import src.api.auth as auth
 
 # Load environment variables
 load_dotenv()
@@ -44,6 +45,7 @@ app.include_router(upload.router, prefix="/api/v1")
 app.include_router(job.router, prefix="/api/v1")
 app.include_router(match.router, prefix="/api/v1")
 app.include_router(ai_routes.router, prefix="/api/v1")
+app.include_router(auth.router, prefix="/api/v1", tags=["auth"])
 
 # Add HEAD compatibility for health check
 @app.api_route("/api/v1/health", methods=["GET", "HEAD"], include_in_schema=False)
