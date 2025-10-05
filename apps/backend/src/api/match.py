@@ -1,46 +1,44 @@
-from fastapi import APIRouter, HTTPException
+from fastapi import APIRouter, Depends, HTTPException
 from pydantic import BaseModel
-from pathlib import Path
-import json
+from sqlalchemy.orm import Session
 
+from src.core.database import get_db
+from src.models.cv_document import CVDocument
+from src.models.job import Job
 from src.services.langchain_service import compute_similarity
 
 router = APIRouter()
-UPLOAD_DIR = Path("uploads")
-JOBS_DIR = Path("jobs")
 
 class MatchRequest(BaseModel):
     cv_filename: str
     job_id: str
 
 @router.post("/match")
-def match_cv_to_job(request: MatchRequest):
-    """Match an uploaded CV to a stored job description and return similarity score."""
-    cv_path = UPLOAD_DIR / request.cv_filename
-    job_path = JOBS_DIR / f"{request.job_id}.json"
+def match_cv_to_job(request: MatchRequest, db: Session = Depends(get_db)):
+    """Compute similarity between a CV and a job stored in the database."""
 
-    if not cv_path.exists():
+    # 1️⃣ Fetch CV
+    cv = db.query(CVDocument).filter(CVDocument.filename == request.cv_filename).first()
+    if not cv:
         raise HTTPException(status_code=404, detail="CV not found")
-    if not job_path.exists():
+
+    # 2️⃣ Fetch job
+    job = db.query(Job).filter(Job.job_id == request.job_id).first()
+    if not job:
         raise HTTPException(status_code=404, detail="Job description not found")
 
-    # Load CV text
-    with open(cv_path, "r") as f:
-        cv_text = f.read()
+    # 3️⃣ Compute similarity score
+    try:
+        score = compute_similarity(cv.content, job.description)
+    except Exception as e:
+        raise HTTPException(status_code=500, detail=f"Similarity computation failed: {str(e)}")
 
-    # Load job description
-    with open(job_path, "r") as f:
-        job_data = json.load(f)
-
-    job_text = job_data["description"]
-
-    # Compute similarity score
-    score = compute_similarity(cv_text, job_text)
-
+    # 4️⃣ Return result
     return {
         "status": "success",
-        "cv": request.cv_filename,
-        "job_id": request.job_id,
+        "cv_filename": cv.filename,
+        "job_title": job.title,
+        "company": job.company,
         "score": score,
-        "message": f"Similarity between CV and job '{job_data['title']}' at {job_data['company']}"
+        "message": f"Similarity between CV '{cv.filename}' and job '{job.title}' at {job.company}"
     }
