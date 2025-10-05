@@ -1,9 +1,10 @@
 import os
 from typing import Dict, Any
 
-from services.llm.llm_interface import LlmProvider
-from services.llm.openai_provider import OpenAIProvider
-from services.llm.openrouter_provider import OpenRouterProvider
+# --- Corrected imports using absolute package path ---
+from src.services.llm.llm_interface import LlmProvider
+from src.services.llm.openai_provider import OpenAIProvider
+from src.services.llm.openrouter_provider import OpenRouterProvider
 
 
 class LlmService:
@@ -21,4 +22,5 @@ class LlmService:
         max_tokens: int = 512,
         temperature: float = 0.2,
     ) -> Dict[str, Any]:
+        """Unified entry point for LLM chat interaction"""
         return await self.provider.chat(prompt, system, max_tokens, temperature)
